@@ -10,6 +10,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "2.0.2",
   "com.typesafe.play" %% "play-slick-evolutions" % "2.0.2",
   "com.h2database" % "h2" % "1.4.190",
-  specs2 % Test
+  specs2 % Test,
+  filters
 )
 
