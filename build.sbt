@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
   //"com.h2database" % "h2" % "1.4.190",
   "mysql" % "mysql-connector-java" % "5.1.34",
   specs2 % Test,
-  filters
+  filters,
+  "com.adrianhurt" %% "play-bootstrap3" % "0.4.5-P24"
 )
 

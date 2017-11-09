@@ -1,18 +1,21 @@
-@(person: Form[CreatePersonForm])(implicit request: RequestHeader,messages: Messages)
+@(person: Form[PersonForm])(implicit request: RequestHeader, messages: Messages)
 
 @import helper._
 
-@main("Welcome to Play") {
-	<script type='text/javascript' src='@routes.Assets.versioned("javascripts/index.js")'></script>
+@main("People") {
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-	<ul id="persons"></ul>
+		<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
-  @form(CSRF(routes.PersonController.addPerson())) {
-		@inputText(person("name"))
-		@inputText(person("age"))
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
-		<div class="buttons">
-			<input type="submit" value="Add Person"/>
-		</div>
-	}
+	<div class="col-xs-2"></div>
+	<div class="col-xs-8">
+		<h2>Play Rest Server</h2>
+		<a href="/persons">ユーザー一覧取得</a>
+	</div>
+	<div class="col-xs-2"></div>
 }

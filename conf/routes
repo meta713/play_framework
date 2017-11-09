@@ -4,8 +4,18 @@
 
 # Home page
 GET     /                           controllers.PersonController.index
-POST    /person                     controllers.PersonController.addPerson
-GET     /persons                    controllers.PersonController.getPersons
+
+GET     /persons/new                controllers.PersonController.newPerson
+GET     /persons/:id/edit           controllers.PersonController.edit(id: Long)
+GET     /persons/:id                controllers.PersonController.show(id: Long)
+#PUT     /persons/:id                controllers.PersonController.replace(id: Long)
+#PATCH   /persons/:id                controllers.PersonController.update(id: Long)
+#DELETE  /persons/:id                controllers.PersonController.delete(id: Long)
+
+POST    /persons                    controllers.PersonController.create
+GET     /persons                    controllers.PersonController.list
+
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

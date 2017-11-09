@@ -1,0 +1,161 @@
+@(personForm: Form[PersonForm], id: Option[Long])(implicit request: RequestHeader, messages: Messages)
+
+@import helper._
+@import b3.vertical.fieldConstructor
+
+@scripts = {
+  <script>
+  jQuery(function($) {
+  function getFormData($form){
+  var unIndexed_array = $form.serializeArray();
+  var indexed_array = {};
+
+  $.map(unIndexed_array, function(n, i){
+  indexed_array[n['name']] = n['value'];
+  });
+
+  return indexed_array;
+  }
+
+  $('#editPerson').submit(function(event) {
+  // HTMLでの送信をキャンセル
+  event.preventDefault();
+
+  // 操作対象のフォーム要素を取得
+  var $form = $(this);
+
+  // 送信ボタンを取得
+  // （後で使う: 二重送信を防止する。）
+  var $button = $form.find('span');
+
+  // 送信
+  $.ajax({
+  url: $form.attr('action'),
+  type: 'PATCH',
+  data: getFormData($form),
+  timeout: 10000,  // 単位はミリ秒
+  // 送信前
+  beforeSend: function(xhr, settings) {
+  // ボタンを無効化し、二重送信を防止
+  $button.attr('disabled', true);
+  },
+  // 応答後
+  complete: function(xhr, textStatus) {
+  // ボタンを有効化し、再送信を許可
+  $button.attr('disabled', false);
+  },
+
+  // 通信成功時の処理
+  success: function(result, textStatus, xhr) {
+  // 入力値を初期化
+  // $form[0].reset();
+
+  $('#result').text('OK');
+  window.location.reload();
+  },
+
+  // 通信失敗時の処理
+  error: function(xhr, textStatus, error) {}
+  });
+  });
+
+  $('#deletePerson').submit(function(event) {
+  // HTMLでの送信をキャンセル
+  event.preventDefault();
+
+  // 操作対象のフォーム要素を取得
+  var $form = $(this);
+
+  // 送信ボタンを取得
+  // （後で使う: 二重送信を防止する。）
+  var $button = $form.find('span');
+
+  // 送信
+  $.ajax({
+  url: $form.attr('action'),
+  type: 'DELETE',
+  data: {
+  'csrfToken': $form.find('[name=csrfToken]').val()
+  },
+  timeout: 10000,  // 単位はミリ秒
+  // 送信前
+  beforeSend: function(xhr, settings) {
+  // ボタンを無効化し、二重送信を防止
+  $button.attr('disabled', true);
+  },
+  // 応答後
+  complete: function(xhr, textStatus) {
+  // ボタンを有効化し、再送信を許可
+  $button.attr('disabled', false);
+  },
+
+  // 通信成功時の処理
+  success: function(result, textStatus, xhr) {
+  // 入力値を初期化
+  // $form[0].reset();
+
+  $('#result').text('OK');
+  // window.location.href = "/persons"
+  window.location.reload();
+  },
+
+  // 通信失敗時の処理
+  error: function(xhr, textStatus, error) {}
+  });
+  });
+  }
+  );
+  </script>
+
+}
+
+@main(
+  if(id.isEmpty) {
+    "Person新規追加"
+  } else {
+    "Person編集"
+  }
+) {
+  @if(id) {
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+      <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+      <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <form method="POST" action="/persons/@id" id="editPerson"></form>
+    @CSRF.formField
+    @b3.hidden("_method", "PATCH")
+    @b3.hidden("id", id)
+    @b3.text(personForm("name"), '_label -> "ニックネーム")
+    @b3.text(personForm("age"), '_label -> "年齢")
+    @b3.submit('class -> "btn btn-default") {
+      <span class="glyphicon glyphicon-ok"></span> 編集
+    }
+
+
+    <form method="POST" action="/persons/@id" id="deletePerson"></form>
+    @CSRF.formField
+
+    @b3.hidden("id", id)
+    @b3.submit('class -> "btn btn-default") {
+      <span class="glyphicon glyphicon-ok"></span> 削除
+    }
+
+  } else {
+    <form method="POST" action="/persons"></form>
+    @CSRF.formField
+    @b3.text(personForm("name"), '_label -> "ニックネーム")
+    @b3.text(personForm("age"), '_label -> "年齢")
+
+    @b3.submit('class -> "btn btn-default") {
+      <span class="glyphicon glyphicon-ok"></span> 保存
+    }
+
+  }
+
+  @scripts
+}

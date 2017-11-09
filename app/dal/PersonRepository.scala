@@ -45,7 +45,7 @@ class PersonRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impl
      * In this case, we are simply passing the id, name and page parameters to the Person case classes
      * apply and unapply methods.
      */
-    def * = (id, name, age) <> ((Person.apply _).tupled, Person.unapply)
+    def * = (id.?, name, age) <> ((Person.apply _).tupled, Person.unapply)
   }
 
   /**
@@ -53,23 +53,39 @@ class PersonRepository @Inject() (dbConfigProvider: DatabaseConfigProvider)(impl
    */
   private val people = TableQuery[PeopleTable]
 
+  def findById(id: Long): Future[Option[Person]] = db.run {
+    people.filter( t => t.id === id.bind).result.headOption
+  }
+
+  def create(person: Person): Future[Int] = db.run {
+    people += person
+  }
+
+  def update(person: Person): Future[Int] = db.run{
+    people.filter( _.id === person.id ).update(person)
+  }
+
+  def delete(id: Long): Future[Int] = db.run{
+    people.filter(_.id === id).delete
+  }
+
   /**
    * Create a person with the given name and age.
    *
    * This is an asynchronous operation, it will return a future of the created person, which can be used to obtain the
    * id for that person.
    */
-  def create(name: String, age: Int): Future[Person] = db.run {
-    // We create a projection of just the name and age columns, since we're not inserting a value for the id column
-    (people.map(p => (p.name, p.age))
-      // Now define it to return the id, because we want to know what id was generated for the person
-      returning people.map(_.id)
-      // And we define a transformation for the returned value, which combines our original parameters with the
-      // returned id
-      into ((nameAge, id) => Person(id, nameAge._1, nameAge._2))
-    // And finally, insert the person into the database
-    ) += (name, age)
-  }
+//  def create(name: String, age: Int): Future[Person] = db.run {
+//    // We create a projection of just the name and age columns, since we're not inserting a value for the id column
+//    (people.map(p => (p.name, p.age))
+//      // Now define it to return the id, because we want to know what id was generated for the person
+//      returning people.map(_.id)
+//      // And we define a transformation for the returned value, which combines our original parameters with the
+//      // returned id
+//      into ((nameAge, id) => Person(id, nameAge._1, nameAge._2))
+//    // And finally, insert the person into the database
+//    ) += (name, age)
+//  }
 
   /**
    * List all the people in the database.
